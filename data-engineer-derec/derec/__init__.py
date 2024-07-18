@@ -1,10 +1,5 @@
 import duckdb
 
-# The code in this file defines test data schema and values. 
-# You can see here the table structures defined by the DDL statements. 
-# The `copy <tablename>` from statement is used to copy data from csv files to the tables. 
-# The test data itself is stored in the `data` folder. 
-
 duckdb.sql("""
 create table Countries(
      Id     int primary key

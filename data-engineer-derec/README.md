@@ -13,17 +13,12 @@ We have only a few records (you can see them in the data folder).
 
 ## Task 0
 
-You have cloned the repository and are in the `seo` branch - Data Engineer. 
+You have cloned the repository and you are in G7 branch - Senior Data Engineer. 
 Familiarise yourself with the code briefly. 
-See the unit tests and modules `__main__.py` as a starting point. 
-The development data can be seen in CVS files in the `derec/data` folder. 
 
-To make sure it all works, we recommend trying the following commands:
+To make sure it all works, try running it:
 
 ```
-poetry shell
-poetry install
-pytest
 python3 derec
 python3 derec test
 ```
@@ -43,25 +38,41 @@ Can you fix the problem?
 
 ## Task 2 
 
-Now that the list is alphabetical, the analysts notice that `Russia` is not on the list. The country is covered by sanctions, so they don't expect any exports, but they still would like to see it on the list to ensure no whiskey is exported. 
+Now that the list is alphabetical, the analysts notice that `Russia` is not on the list. 
+The country is covered by sanctions, so they don't expect any exports, but they still would like to see it on the list to ensure no whiskey is exported. 
 
-You speak to your team. They have considered this scenario and it is covered by the test data you are working with already.
+You speak to your team. They have considered this scenario and it is covered by the test data you are working with already. 
 
-Ensure countries with no exports show up on the list.
+Ensure countries with no exports show up on the list
 
 ## Task 3
 
-The tool allows to check top exports per country. At the moment it is always top 3 export. 
-The users would like to be able to specify the number of top records to show. 
-
-The current behaviour can be seen by executing 
+Another user complaints that when they try to get top exports per country the `derec` tool is very slow to return its results. 
 
 ```
 python3 derec show top
 ```
 
-We need to be able to do something like 
+Remember, they have much more data in production than we have in development,
+so you will have to analyse the code to understand the problem to improve its performance. 
+
+## Task 4
+
+A new feature has been requested. Our users would like to be able to specify the number of top types of whiskey they want to see, 
+something like this would much the default behaviour at the moment.
 
 ```
-python3 derec show top 2
+python3 derec show top 3
 ```
+
+But they would also like to do things like this:
+ 
+```
+python3 derec show top 1
+```
+
+## Task 5
+
+A new feature has been requested.
+Our users would like to add a new command `save` which will save the output of the programme (countries or top) to a JSON file.
+They haven't specified the format, so you will have to design it. 

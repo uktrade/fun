@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" class="govuk-template">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michal's 404 Adventure: Dodging Digital Dinos</title>
+    <link rel="stylesheet" href="govuk-frontend.min.css">
+    <script src="govuk-frontend.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+        }
+        .govuk-main-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 150px);
+        }
+        canvas {
+            border: 1px solid black;
+            background-image: url(park_background.png);
+        }
+    </style>
+</head>
+<body class="govuk-template__body">
+    <header class="govuk-header" role="banner" data-module="govuk-header">
+        <div class="govuk-header__container govuk-width-container">
+            <div class="govuk-header__logo">
+                <a href="/" class="govuk-header__link govuk-header__link--homepage">
+                    <span class="govuk-header__logotype">
+                        <svg role="presentation" focusable="false" class="govuk-header__logotype-crown" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 97" height="32" width="36">
+                            <!-- SVG content for crown logo -->
+                        </svg>
+                        <span class="govuk-header__logotype-text">
+                            GOV.UK
+                        </span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="govuk-width-container">
+        <h1 class="govuk-heading-m govuk-!-padding-top-5">Michal's 404 Adventure: Dodging Digital Dinos</h1>
+        <main class="govuk-main-wrapper govuk-main-wrapper--auto-spacing" id="main-content" role="main">
+            
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+        </main>
+    </div>
+
+    <footer class="govuk-footer" role="contentinfo">
+        <div class="govuk-width-container">
+            <div class="govuk-footer__meta">
+                <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                    <span class="govuk-footer__licence-description">
+                        All content is available under the
+                        <a class="govuk-footer__link" href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government Licence v3.0</a>,
+                        except where otherwise stated
+                    </span>
+                </div>
+                <div class="govuk-footer__meta-item">
+                    <a class="govuk-footer__link govuk-footer__copyright-logo" href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright/">
+                        © Crown copyright
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const SCREEN_WIDTH = canvas.width;
+        const SCREEN_HEIGHT = canvas.height;
+        const GROUND_Y = SCREEN_HEIGHT - 100;
+
+        const characterImage = new Image();
+        characterImage.src = 'sprite_sheet.png';
+        const character = {
+            x: 50,
+            y: SCREEN_HEIGHT - 100,
+            width: 100,
+            height: 100,
+            velocityY: 0,
+            gravity: 1,
+            isJumping: false,
+            frameIndex: 0,
+            frameCount: 4,
+            frameSpeed: 5,
+            frameTick: 0
+        };
+
+        const meetingImage = new Image();
+        meetingImage.src = 'teams.png';
+        
+        const statusCodeImage504 = new Image();
+        statusCodeImage504.src = '504.png';
+        
+        const statusCodeImage404 = new Image();
+        statusCodeImage404.src = '404.png';
+
+        const dinosaur = new Image();
+        dinosaur.src = 'dinosaur.png'
+
+        const obstacles = [
+            { type: 'furious dinosaur', x: SCREEN_WIDTH, y: SCREEN_HEIGHT - 100, width: 90, height: 90, speed: 4, image: dinosaur },
+            { type: 'Teams meeting', x: SCREEN_WIDTH + 300, y: SCREEN_HEIGHT - 100, width: 90, height: 90, speed: 4, image: meetingImage },
+            { type: '504 status code', x: SCREEN_WIDTH + 600, y: SCREEN_HEIGHT - 100, width: 90, height: 90, speed: 4, image: statusCodeImage504 },
+            { type: '404 status code', x: SCREEN_WIDTH + 900, y: SCREEN_HEIGHT - 100, width: 90, height: 90, speed: 4, image: statusCodeImage404 },
+        ];
+
+        function drawCharacter() {
+            const frameX = character.frameIndex * character.width;
+            ctx.drawImage(characterImage, frameX, 0, character.width, character.height, character.x, character.y, character.width, character.height);
+            character.frameTick++;
+            if (character.frameTick >= character.frameSpeed) {
+                character.frameIndex = (character.frameIndex + 1) % character.frameCount;
+                character.frameTick = 0;
+            }
+        }
+
+        function drawObstacle(obstacle) {
+            ctx.drawImage(obstacle.image, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        }
+
+        function update() {
+            if (character.isJumping) {
+                character.y += character.velocityY;
+                character.velocityY += character.gravity;
+                if (character.y >= GROUND_Y) {
+                    character.y = GROUND_Y;
+                    character.isJumping = false;
+                }
+            }
+
+            obstacles.forEach((obstacle, index) => {
+                obstacle.x -= obstacle.speed;
+                if (obstacle.x < -obstacle.width) {
+                    obstacle.x = SCREEN_WIDTH + index * 300;
+                }
+
+                const characterRect = { x: character.x, y: character.y, width: character.width, height: character.height };
+                const obstacleRect = { x: obstacle.x, y: obstacle.y, width: obstacle.width, height: obstacle.height };
+
+                if (characterRect.x < obstacleRect.x + obstacleRect.width &&
+                    characterRect.x + characterRect.width > obstacleRect.x &&
+                    characterRect.y < obstacleRect.y + obstacleRect.height &&
+                    characterRect.y + characterRect.height > obstacleRect.y) {
+                        alert("Michal hit a " + obstacle.type + " :(");
+                    resetGame();
+                }
+            });
+        }
+
+        function resetGame() {
+            character.y = SCREEN_HEIGHT - 100;
+            obstacles.forEach((obstacle, index) => {
+                obstacle.x = SCREEN_WIDTH + index * 300;
+            });
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            update();
+            drawCharacter();
+            obstacles.forEach(drawObstacle);
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.addEventListener('keydown', function(event) {
+            if (event.code === 'Space') {
+                event.preventDefault(); // don't remove this its stopping the screen moving down
+                if (!character.isJumping) {
+                character.isJumping = true;
+                character.velocityY = -25;
+            }
+        }
+        });
+
+        Promise.all([
+            new Promise(resolve => characterImage.onload = resolve),
+            new Promise(resolve => meetingImage.onload = resolve),
+            new Promise(resolve => statusCodeImage504.onload = resolve),
+            new Promise(resolve => statusCodeImage404.onload = resolve)
+        ]).then(() => {
+            gameLoop();
+        });
+
+    </script>
+</body>
+</html>
